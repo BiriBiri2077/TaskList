@@ -1,17 +1,38 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,Image } from 'react-native';
+import { StyleSheet, Text, View,ImageBackground } from 'react-native';
 
 export default function App() {
+  
+  const image = require('./resources/bg.jpg');
+  
+  
   return (
-    <View>
-      <Text style={{fontSize:22, textAlign:'center', paddingTop:20, backgroundColor:'grey',paddingBottom:5}}>pudim bobao</Text>
-      <StatusBar style="auto" />
-      <Image source={{uri: 'https://rlv.zcache.com.br/relogio_grande_sorrindo_o_macaco-rf6b6ef91230943a6a423bb593437c552_s0ysp_8byvr_644.jpg'}}
-       style={{width: 400, height: 400}} />
+    <View style={{flex:1}}>
+      <ImageBackground source={image} style={styles.image}>
+      <View style={styles.coverView}>
+        <Text style={styles.textHeader}>Lista de tarefas</Text>
+        </View>
+      </ImageBackground>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
+  image: {
+    width:'100%',
+    height:80,
+    resizeMode:"cover",
+    justifyContent:'center',
+  },
+  coverView: {
+    width:'100%',
+    height:80,
+    backgroundColor:'rgba(0,0,0,0.5)'
+  },
+  textHeader: {
+    textAlign:'center',
+    color:'white',
+    fontSize:20,
+    marginTop:20
+  }
 });
