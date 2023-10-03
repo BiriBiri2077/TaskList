@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
-import { StyleSheet, Text, View,ImageBackground, TextInput, TouchableOpacity, TouchableHighlight,SafeAreaView, Modal } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { StyleSheet, Text, View,ImageBackground, TextInput, TouchableOpacity, TouchableHighlight, ScrollView, Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function App() {
@@ -10,19 +11,28 @@ export default function App() {
 
   const [tarefaAtual,setTaskAtual] = useState('');
   
-  const [tarefas, setarTarefas] = useState([
-    {
-      id: 1,
-      tarefa: 'Minha tarefa 1.'
-    },
-    {
-      id:2,
-      tarefa: 'Minha tarefa 2.'
-    }
-  ]);
+  const [tarefas, setarTarefas] = useState([]);
 
   const [modal,setModal] = useState(false);
 
+
+
+  useEffect(()=>{
+    //alert('app carregado...');
+
+    (async () => {
+      try {
+        let tarefaAtual = await AsyncStorage.getItem('tarefas');
+        if(tarefaAtual == null)
+        setarTarefas([]);
+      else
+        setarTarefas(JSON.parse(tarefaAtual));
+      } catch (error) {
+
+      }
+    })();
+  });
+  
  
   
   function deletarTarefa(id){
@@ -32,6 +42,13 @@ export default function App() {
     });
 
     setarTarefas(newTarefas);
+
+    (async () => {
+      try {
+        await AsyncStorage.setItem('tarefas', JSON.stringify(newTarefas));
+      } catch (error) {}
+    })();
+
   }
 
   function addTarefa(){
@@ -45,14 +62,20 @@ export default function App() {
 
       setarTarefas([...tarefas,tarefa]);
 
+      (async () => {
+        try {
+          await AsyncStorage.setItem('tarefas', JSON.stringify([...tarefas,tarefa]));
+        } catch (error) {}
+      })();
+
   }
 
   
 
 
   return (
-    <View style={{flex:1}}>
-
+    <ScrollView style={{flex:1}}>
+      
       <Modal
         animationType="slide"
         transparent={true}
@@ -87,10 +110,10 @@ export default function App() {
       tarefas.map(function(val){
     return (<View style={styles.tarefaSingle}>
       <View style={{flex:1,width:'100%', padding:10}}>
-        <Text>{val.tarefa}</Text>
+        <Text style={{fontSize:18}}>{val.tarefa}</Text>
       </View>
       <View style={{alignItems:'flex-end', flex:1, paddingEnd:10}}>
-        <TouchableOpacity onPress={()=> deletarTarefa(val.id)}><Text style={{fontSize:25}}>+</Text></TouchableOpacity>
+        <TouchableOpacity onPress={()=> deletarTarefa(val.id)}><Text style={{fontSize:35, paddingRight:10}}>-</Text></TouchableOpacity>
       </View>
     </View>);
     })
@@ -99,20 +122,20 @@ export default function App() {
     <TouchableOpacity style={styles.bynAddTarefa} onPress={()=>setModal(true)}><Text style={{textAlign:'center', color:'white'}}>Adicionar Tarefa!</Text></TouchableOpacity>
 
 
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   image: {
     width:'100%',
-    height:80,
+    height:60,
     resizeMode:"cover",
     justifyContent:'center',
   },
   coverView: {
     width:'100%',
-    height:80,
+    height:60,
     backgroundColor:'rgba(0,0,0,0.5)'
   },
   textHeader: {
@@ -135,7 +158,7 @@ const styles = StyleSheet.create({
     backgroundColor:'rgba(0,0,0,0.5)'
   },
   modalView: {
-    margin: 20,
+    margin: 50,
     backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
@@ -169,7 +192,9 @@ const styles = StyleSheet.create({
     width:200,
     padding:8,
     backgroundColor:'gray',
-    marginTop:20
+    marginTop:20,
+    alignSelf:'center',
+    borderRadius:20
   }
 
  
